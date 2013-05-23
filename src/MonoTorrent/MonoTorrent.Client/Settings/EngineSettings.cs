@@ -139,6 +139,7 @@ namespace MonoTorrent.Client
         private const int DefaultMaxHalfOpenConnections = 5;
         private const EncryptionTypes DefaultAllowedEncryption = EncryptionTypes.All;
         private const int DefaultListenPort = 52138;
+        private static string DefaultClientVersion = VersionInfo.CreateClientVersion();
 
         #endregion
 
@@ -179,7 +180,7 @@ namespace MonoTorrent.Client
             ListenPort = listenPort;
             AllowedEncryption = allowedEncryption;
             SavePath = defaultSavePath;
-            ClientVersion = VersionInfo.CreateClientVersion();
+            ClientVersion = DefaultClientVersion;
         }
  
         #endregion

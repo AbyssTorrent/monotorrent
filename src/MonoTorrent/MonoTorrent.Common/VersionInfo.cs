@@ -43,31 +43,41 @@ namespace MonoTorrent.Common
         /// </summary>
         public static readonly string ProtocolStringV100 = "BitTorrent protocol";
 
-        /// <summary>
-        /// The current version of the client
-        /// </summary>
-        public static readonly string ClientVersion = CreateClientVersion ();
-
         public static readonly string DhtClientVersion = "MO06";
 
         internal static  Version Version;
-		static string CreateClientVersion ()
+
+        public static string CreateClientVersion()
+        {
+            return CreateClientVersion("MO", Assembly.GetExecutingAssembly());
+        }
+
+		public static string CreateClientVersion(string clientCode, ICustomAttributeProvider assembly)
 		{
-			AssemblyInformationalVersionAttribute versionAttr;
-			Assembly assembly = Assembly.GetExecutingAssembly ();
-			versionAttr = (AssemblyInformationalVersionAttribute) assembly.GetCustomAttributes (typeof (AssemblyInformationalVersionAttribute), false)[0];
+            if(clientCode.Length != 2)
+                throw new ArgumentException("ClientCode needs to be a 2 character string", "clientCode");
+
+		    var versionAttrs = assembly.GetCustomAttributes(typeof (AssemblyInformationalVersionAttribute), false);
+            if(versionAttrs.Length == 0)
+                throw new ArgumentException("Unable to find AssemblyInformationalVersionAttribute", "assembly");
+
+		    var versionAttr = (AssemblyInformationalVersionAttribute) versionAttrs[0];
+
 			Version = new Version(versionAttr.InformationalVersion);
 
-			    // 'MO' for MonoTorrent then four digit version number
-            string version = string.Format ("{0}{1}{2}{3}", Math.Max (Version.Major, 0),
-                                                            Math.Max (Version.Minor, 0),
-                                                            Math.Max (Version.Build, 0),
-                                                            Math.Max (Version.Revision, 0));
-            if (version.Length > 4)
-                version = version.Substring (0, 4);
-            else
-                version = version.PadRight (4, '0');
-			return string.Format ("-MO{0}-", version);
+            // Build Version String
+		    var version = string.Format("{0}{1}{2}{3}",
+                Math.Max(Version.Major, 0),
+		        Math.Max(Version.Minor, 0),
+		        Math.Max(Version.Build, 0),
+		        Math.Max(Version.Revision, 0));
+
+            version = version.Length > 4 ?
+                version.Substring (0, 4) :
+                version.PadRight (4, '0');
+
+
+		    return string.Format("-{0}{1}-", clientCode, version);
 		}
     }
 }

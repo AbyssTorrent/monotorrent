@@ -303,11 +303,11 @@ namespace MonoTorrent.Client
             });
         }
 
-        private static string GeneratePeerId()
+        private string GeneratePeerId()
         {
-            StringBuilder sb = new StringBuilder(20);
+            var sb = new StringBuilder(20);
 
-            sb.Append(Common.VersionInfo.ClientVersion);
+            sb.Append(settings.ClientVersion);
             lock (random)
                 while (sb.Length < 20)
                     sb.Append (random.Next (0, 9));

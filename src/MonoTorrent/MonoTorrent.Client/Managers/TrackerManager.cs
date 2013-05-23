@@ -201,14 +201,28 @@ namespace MonoTorrent.Client.Tracker
             long bytesLeft = 1000;
             if (manager.HasMetadata)
                 bytesLeft = (long)((1 - this.manager.Bitfield.PercentComplete / 100.0) * this.manager.Torrent.Size);
-            AnnounceParameters p = new AnnounceParameters(this.manager.Monitor.DataBytesDownloaded,
-                                                this.manager.Monitor.DataBytesUploaded,
-                                                bytesLeft,
-                                                clientEvent, this.infoHash, requireEncryption, manager.Engine.PeerId,
-                                                ip, port);
-            p.SupportsEncryption = supportsEncryption;
-            TrackerConnectionID id = new TrackerConnectionID(tracker, trySubsequent, clientEvent, waitHandle);
+
+            var p = new AnnounceParameters
+            {
+                BytesDownloaded = manager.Monitor.DataBytesDownloaded,
+                BytesUploaded = manager.Monitor.DataBytesUploaded,
+                BytesLeft = bytesLeft,
+
+                ClientEvent = clientEvent,
+                InfoHash = infoHash,
+
+                Ipaddress = ip,
+                Port = port,
+                PeerId = manager.Engine.PeerId,
+                ClientVersion = manager.Engine.Settings.ClientVersion,
+
+                RequireEncryption = requireEncryption,
+                SupportsEncryption = supportsEncryption
+            };
+
+            var id = new TrackerConnectionID(tracker, trySubsequent, clientEvent, waitHandle);
             tracker.Announce(p, id);
+
             return waitHandle;
         }
 
@@ -311,8 +325,14 @@ namespace MonoTorrent.Client.Tracker
             if (!tracker.CanScrape)
                 throw new TorrentException("This tracker does not support scraping");
 
-            TrackerConnectionID id = new TrackerConnectionID(tracker, trySubsequent, TorrentEvent.None, new ManualResetEvent(false));
-            tracker.Scrape(new ScrapeParameters(this.infoHash), id);
+            var id = new TrackerConnectionID(tracker, trySubsequent, TorrentEvent.None, new ManualResetEvent(false));
+
+            tracker.Scrape(new ScrapeParameters
+            {
+                InfoHash = infoHash,
+                ClientVersion = manager.Engine.Settings.ClientVersion
+            }, id);
+
             return id.WaitHandle;
         }
 

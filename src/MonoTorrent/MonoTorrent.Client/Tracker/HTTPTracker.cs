@@ -83,10 +83,12 @@ namespace MonoTorrent.Client.Tracker
         {
             try
             {
-                Uri announceString = CreateAnnounceString(parameters);
-                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(announceString);
-                request.UserAgent = MonoTorrent.Common.VersionInfo.ClientVersion;
+                var announceString = CreateAnnounceString(parameters);
+
+                var request = (HttpWebRequest)HttpWebRequest.Create(announceString);
+                request.UserAgent = parameters.ClientVersion;
                 request.Proxy = new WebProxy();   // If i don't do this, i can't run the webrequest. It's wierd.
+
                 RaiseBeforeAnnounce();
                 BeginRequest(request, AnnounceReceived, new object[] { request, state });
             }
@@ -292,8 +294,9 @@ namespace MonoTorrent.Client.Tracker
                 else
                     url += "&info_hash=" + parameters.InfoHash.UrlEncode ();
 
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.UserAgent = MonoTorrent.Common.VersionInfo.ClientVersion;
+                var request = (HttpWebRequest)WebRequest.Create(url);
+                request.UserAgent = parameters.ClientVersion;
+
                 BeginRequest(request, ScrapeReceived, new object[] { request, state });
             }
             catch
