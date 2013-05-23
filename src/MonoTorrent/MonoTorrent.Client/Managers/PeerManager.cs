@@ -28,6 +28,30 @@ namespace MonoTorrent.Client
         }
 
         /// <summary>
+        /// Returns the number of available Leechs
+        /// </summary>
+        /// <returns></returns>
+        public int LeechsTotal
+        {
+            get
+            {
+                return (int)ClientEngine.MainLoop.QueueWait(() => Toolbox.Count(AllPeers(), p => !p.IsSeeder));
+            }
+        }
+
+        /// <summary>
+        /// Returns the number of available Seeds
+        /// </summary>
+        /// <returns></returns>
+        public int SeedsTotal
+        {
+            get
+            {
+                return (int)ClientEngine.MainLoop.QueueWait(() => Toolbox.Count(AllPeers(), p => !p.IsSeeder));
+            }
+        }
+
+        /// <summary>
         /// Returns the number of Leechs we are currently connected to
         /// </summary>
         /// <returns></returns>
